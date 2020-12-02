@@ -9,10 +9,11 @@ Run 'demoScript_Batch_NoInput.m' to see an example of a script that analyses 8 i
 
 Note that both scripts require 'Image Processing Toolbox' and 'Statistics and Machine Learning Toolbox' to run.
 
+```
 Functions called by demoScript_OneImage_ManualInput.m and demoScript_Batch_NoInput.m:
-segmentDAPIimage.m
-tipScoreIm.m
-returnTableWithCellInt.m
-returnTableWithCellPairInt.m
-
+-segmentDAPIimage.m
+-tipScoreIm.m
+-returnTableWithCellInt.m
+-returnTableWithCellPairInt.m
+```
 
