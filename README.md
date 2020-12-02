@@ -1,5 +1,5 @@
 # TipScore
-**MATLAB** functions for image analysis of a branched organ structures (such as the pancreas). See details [here](https://docs.google.com/document/d/143IZt6-4IdLZK5zwaFn9D988-nppJYnUX7sv5Kt3IIc/edit)
+**MATLAB** functions for image analysis of branched organ structures (such as the pancreas). See details [here](https://docs.google.com/document/d/143IZt6-4IdLZK5zwaFn9D988-nppJYnUX7sv5Kt3IIc/edit)
 
 - Make sure that current Matlab directory contains the folder ``` sample_images ``` and all function .m files listed further below:
 
