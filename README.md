@@ -5,9 +5,9 @@ MATLAB functions for image analysis of branched organ structures (such as pancre
 
 - Run ``` 'demoScript_OneImage_ManualInput.m' ``` to see an example of a script that analyses one image with manual input from the user during the run.
 
-- Run ``` 'demoScript_Batch_NoInput.m' ``` to see an example of a script that analyses 8 images with no manual input from the user.
+- Run ``` 'demoScript_Batch_NoInput.m' ``` to see an example of a script that analyses all 8 sample images with no manual input from the user.
 
-- Note that both scripts require 'Image Processing Toolbox' and 'Statistics and Machine Learning Toolbox' to run.
+- Note that both scripts require **'Image Processing Toolbox'** and **'Statistics and Machine Learning Toolbox'** to run.
 
 - Functions called by ``` demoScript_OneImage_ManualInput.m ``` and  ``` demoScript_Batch_NoInput.m ``` :
 
