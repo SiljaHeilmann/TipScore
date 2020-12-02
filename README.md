@@ -9,7 +9,7 @@ MATLAB functions for image analysis of branched organ structures (such as pancre
 
 - Note that both scripts require 'Image Processing Toolbox' and 'Statistics and Machine Learning Toolbox' to run.
 
-- Functions called by demoScript_OneImage_ManualInput.m and demoScript_Batch_NoInput.m:
+- Functions called by ``` demoScript_OneImage_ManualInput.m ``` and  ``` demoScript_Batch_NoInput.m ``` :
 
 ```
 segmentDAPIimage.m
