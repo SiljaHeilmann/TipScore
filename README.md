@@ -1,6 +1,7 @@
-<img width="1068" alt="Screen Shot 2021-04-13 at 13 40 59" src="https://user-images.githubusercontent.com/11952601/114546969-164dfa00-9c5e-11eb-9051-7f91bb9edbd6.png">
 # TipScore
 **MATLAB** functions for image analysis of branched organ structures (such as the pancreas). See details [here](https://docs.google.com/document/d/143IZt6-4IdLZK5zwaFn9D988-nppJYnUX7sv5Kt3IIc/edit)
+
+<img width="500" alt="Screen Shot 2021-04-13 at 13 40 59" src="https://user-images.githubusercontent.com/11952601/114546969-164dfa00-9c5e-11eb-9051-7f91bb9edbd6.png">
 
 - Download test data folders ``` raw_images_lsm_files ``` and ``` outlines_mat_files ``` from [Mendeley Data](https://data.mendeley.com/drafts/nr9cyyk265). (580MB) 
 
