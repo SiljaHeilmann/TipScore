@@ -1,3 +1,4 @@
+<img width="1068" alt="Screen Shot 2021-04-13 at 13 40 59" src="https://user-images.githubusercontent.com/11952601/114546969-164dfa00-9c5e-11eb-9051-7f91bb9edbd6.png">
 # TipScore
 **MATLAB** functions for image analysis of branched organ structures (such as the pancreas). See details [here](https://docs.google.com/document/d/143IZt6-4IdLZK5zwaFn9D988-nppJYnUX7sv5Kt3IIc/edit)
 
