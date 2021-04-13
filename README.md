@@ -1,7 +1,9 @@
 # TipScore
 **MATLAB** functions for image analysis of branched organ structures (such as the pancreas). See details [here](https://docs.google.com/document/d/143IZt6-4IdLZK5zwaFn9D988-nppJYnUX7sv5Kt3IIc/edit)
 
-- Make sure that current Matlab directory contains the folder ``` sample_images ``` and all function .m files listed further below:
+- Download test data folders ``` raw_images_lsm_files ``` and ``` outlines_mat_files ``` from [Mendeley Data](https://data.mendeley.com/drafts/nr9cyyk265) 
+
+- Make sure that current Matlab directory contains the folders ``` raw_images_lsm_files ``` and ``` outlines_mat_files ``` and all function .m files listed further below:
 
 - Run ``` 'demoScript_OneImage_ManualInput.m' ``` to see an example of a script that analyses one image with manual input from the user during the run.
 
