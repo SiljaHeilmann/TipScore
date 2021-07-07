@@ -7,7 +7,7 @@
 
 - Run ``` 'demoScript_OneImage_ManualInput.m' ``` to see an example of a script that analyses one image with manual input from the user during the run.
 
-- Run ``` 'demoScript_Batch_NoInput.m' ``` to see an example of a script that analyses all 8 sample images with no manual input from the user.
+- Run ``` 'demoScript_Batch_NoInput.m' ``` to see an example of a script that analyses all 7 sample images with no manual input from the user.
 
 - Note that both scripts require **'Image Processing Toolbox'** and **'Statistics and Machine Learning Toolbox'** and 2018a version MATLAB or newer to run.
 
