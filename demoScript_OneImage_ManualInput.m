@@ -2,43 +2,43 @@ close all
 clear all
 
 path = pwd;  % pwd returns the path to the current folder.
-subfolderLSM = '/raw_images_lsm_files';
-subfolderMAT = '/outlines_mat_files';
+subfolderTIF = 'raw_images_tif_files';
+subfolderMAT  = 'outlines_mat_files';
 
-list_lsm = dir([path filesep subfolderLSM filesep '*.lsm']);
-list_mat = dir([path filesep subfolderMAT filesep '*OL.mat']);
+list_tif = dir([path filesep subfolderTIF filesep '*.tif']);
+list_mat  = dir([path filesep subfolderMAT filesep '*OLnew.mat']);
 
-ff = 7;%% Run with manual input for just one image file in folder (raw_images_lsm_files) with 8 test images
+ff = 6;%% Run with manual input for just one image file in folder (raw_images_lsm_files) with 8 test images
 
-lsm_image_string   = [path filesep subfolderLSM filesep list_lsm(ff).name];
-mat_outLine_string = [path filesep subfolderMAT filesep list_mat(ff).name];
+tif_image_string   = [path filesep subfolderTIF filesep list_tif(ff).name];
+mat_outLine_string  = [path filesep subfolderMAT  filesep list_mat(ff).name];
 
-% ------------------------------------------------------------------------    
+% -------------------------------------------------------------------------    
 % Load image file and handdrawn outline    
 
 load(mat_outLine_string);% load hand drawn epithelial outline saved in .mat file
 
-t = Tiff(lsm_image_string); % create tiff object
-I = read(t); % read in image file (Tiff() reader works on .lsm zeiss files)
-close(t);% close tiff object
+OL = OLnew;% OL is called OLnew in .mat file
+clear OLnew
 
-C1 = double(I(:,:,1));% make double
-C2 = double(I(:,:,2));
-C3 = double(I(:,:,3));
-C4 = double(I(:,:,4));
+C1 = double(imread(tif_image_string,1));% make double
+C2 = double(imread(tif_image_string,2));
+C3 = double(imread(tif_image_string,3));
+C4 = double(imread(tif_image_string,4));
 
-% Make normalized images for viewing  (normalize with respect to max
-% value)
-C1norm = C1./max(C1(:));
-C2norm = C2./max(C2(:));
-C3norm = C3./max(C3(:));
-C4norm = C4./max(C4(:));
-
+% Make normalized images for viewing  (normalize with respect to 99
+% percentile value)
+C1norm = C1./prctile(C1(:),99.0);
+C2norm = C2./prctile(C2(:),99.0);
+C3norm = C3./prctile(C3(:),99.0);
+C4norm = C4./prctile(C4(:),99.0);
+    
 % make normalized rgb color image for quick viewing
-COL = uint8(zeros(size(I,1),size(I,2),3));
-COL(:,:,1) = uint8(C3norm.*255) + uint8(C1norm.*255).*5;% red Sox9 (C3)      , white CPA (C1)
-COL(:,:,2) = uint8(C2norm.*255) + uint8(C1norm.*255).*5;% green p120ctn (C2) , white CPA (C1)
-COL(:,:,3) = uint8(C4norm.*255) + uint8(C1norm.*255).*5;% blue DAPI (C4)     , white CPA (C1)
+COL = uint8(zeros(size(C1,1),size(C1,2),3));
+
+COL(:,:,1) = uint8(C3norm.*255) + uint8(C1norm.*255);% red Sox9 (C3)      , white CPA (C1)
+COL(:,:,2) = uint8(C2norm.*255) + uint8(C1norm.*255);% green p120ctn (C2) , white CPA (C1)
+COL(:,:,3) = uint8(C4norm.*255) + uint8(C1norm.*255);% blue DAPI (C4)     , white CPA (C1)
 
 OL = imfill(OL,'holes');
 
@@ -47,7 +47,6 @@ OL = imfill(OL,'holes');
 OL3edge = uint8(zeros(size(OL,1),size(OL,2),3)); OL3edge(:,:,1) = bwperim(OL); OL3edge(:,:,2) = bwperim(OL); OL3edge(:,:,3) = bwperim(OL);
 
 COL_show = COL; COL_show(imdilate(OL3edge,strel('disk',3))==1)=2^8-1;
-
 
 % ------------------------------------------------------------------------    
 % Tip score calculation from outline OL    
@@ -93,7 +92,7 @@ NUCLEI_BW = segmentDAPIimage(IM,ROI,approxPixelWidthOfCellNuclei,manual_input_ye
 figure
 imshow(labeloverlay((IM./max(IM(:))),bwlabel(NUCLEI_BW,4))); title('Final nuclei segmentation. If result is oversegmented then try again with a slighty larger approx. pixel diameter of nucleus. Else set manual-input-yes-no==1 and answer prompts in command line')
 
-
+%
 % ---------------------------------------------------------------------------------------------------------------------
 % Make Tcells table with image intensities and tip scores per cell for image using the returnTableWithCellInt() function
 
@@ -119,13 +118,13 @@ Tcells = [TcellsC1,TcellsC3(:,4),TcellsTSC(:,4)];% merge tables
 Tcells.CPAintensityNorm  = Tcells.CPAintensity./nanmedian(Tcells.CPAintensity(Tcells.tipScore>-0.75 & Tcells.tipScore<-0.25));% Normalize intensity with respect median signal for group of cells with similar tipscore (tipScore=[-0.75;-0.25]is group that usually have a lot of cells...)
 Tcells.Sox9intensityNorm = Tcells.Sox9intensity./nanmedian(Tcells.Sox9intensity(Tcells.tipScore>-0.75 & Tcells.tipScore<-0.25));% Normalize intensity with respect median signal for group of cells with similar tipscore (tipScore=[-0.75;-0.25]is group that usually have a lot of cells...)
 
-Tcells(1:3,:)% show first three rows of final table in command line
+%Tcells(1:3,:)% show first three rows of final table in command line
 
 % ---------------------------------------------------------------------------------------------------------------------
 % Make TcellPairs table with image intensities and tip scores for image using the returnTableWithCellPairInt() function
 
 approxPixelWidthOfCellNuclei = 35; % sets threshold for which cells are considered direct neighbors (larger number means more neiborg pairs and increased chance of line scab crossing two cell membrane)
-plot_yes_no = 1; % WARNING!! - drawing a lot of lines on an image takes time so set this to 0 when you dont need to inspect where the line scans are done!!!
+plot_yes_no = 1;%1; % WARNING!! - drawing a lot of lines on an image takes time so set this to 0 when you dont need to inspect where the line scans are done!!!
 
 TcellPairsp120ctn  = returnTableWithCellPairInt(NUCLEI_BW,C2,approxPixelWidthOfCellNuclei,plot_yes_no);
 TcellPairsp120ctn.Properties.VariableNames{'lineScanMax'} = 'p120ctnMaxInt';% change genric name to specific marker name
@@ -150,23 +149,22 @@ tipscoregroups = unique(TcellPairs.tipScoreGroup);
 tipscoregroups = tipscoregroups(isfinite(tipscoregroups));
 
 % ---------------------------------------------------------------------------------------------------------------------
-% the dist. tails that have very low or very high tip scores contain few
+% the distribution tails (very low or very high tip scores) contain few
 % meassurements - pool them
-index1 = 6;
+index1 = 5;
 TcellPairs.tipScoreGroup(TcellPairs.tipScoreGroup<tipscoregroups(index1)) = tipscoregroups(index1);
 Tcells.tipScoreGroup(Tcells.tipScoreGroup<tipscoregroups(index1)) = tipscoregroups(index1);
-index2 = length(tipscoregroups)-1;
+index2 = length(tipscoregroups);
 TcellPairs.tipScoreGroup(TcellPairs.tipScoreGroup>tipscoregroups(index2)) = tipscoregroups(index2);
 Tcells.tipScoreGroup(Tcells.tipScoreGroup>tipscoregroups(index2)) = tipscoregroups(index2);
 
-TcellPairs(1:3,:)% write out first 3 rows of table to command line
-
+TcellPairs(1:3,:)% write out first 3 rows of table to command line to inspect
 
 % ---------------------------------------------------------------------------------------------------------------------
 % Plot Sox9 intensity per cell as a function of tipscore. And compare groups with Kruskal Wallis
 figure
 boxplot(Tcells.Sox9intensityNorm,Tcells.tipScoreGroup,'Notch','on','jitter',.1,'symbol','.'); hold on
-xlabel('Tip score'); set(gca,'xticklabel',{'TS below -0.6','TS between -0.6 and -0.2','TS between -0.2 and 0.2','TS above 0.2' })
+xlabel('Tip score');   set(gca,'xticklabel',{'-0.6: (TS below -0.45)','-0.3: (TS between -0.45) and -0.15','0: (TS between -0.15 and 0.15)','0.3: (TS between 0.15 and 0.45)','0.6: (TS above 0.45)' })
 
 ylabel('Normalized  Sox9 intensity per cell')
 
@@ -177,7 +175,7 @@ ylabel('Normalized  Sox9 intensity per cell')
 % Plot p120ctn intensity as a function of (coarse grained) tip score. And compare groups with Kruskal Wallis
 figure 
 boxplot(TcellPairs.p120ctnMaxIntNorm,TcellPairs.tipScoreGroup,'Notch','on','jitter',.1,'symbol','.'); hold on
-xlabel('Tip score');  set(gca,'xticklabel',{'TS below -0.6','TS between -0.6 and -0.2','TS between -0.2 and 0.2','TS above 0.2' })
+xlabel('Tip score');  set(gca,'xticklabel',{'-0.6: (TS below -0.45)','-0.3: (TS between -0.45) and -0.15','0: (TS between -0.15 and 0.15)','0.3: (TS between 0.15 and 0.45)','0.6: (TS above 0.45)' })
 
 ylabel('Normalized max p120ctn int. per cell-pair linescan')
 
