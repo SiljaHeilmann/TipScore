@@ -36,7 +36,7 @@ IMmemb = imgaussfilt(IMmemb,[approxPixelWidthOfCellNuclei approxPixelWidthOfCell
 if plot_yes_no == 1
     
     figure('units','normalized','outerposition',[0 0.2 1 0.6]);
-    imshow(IMmemb,[]); hold on
+    imshow(double(IMmemb)./prctile(double(IMmemb(:)),95),[]); hold on
     plot(centroids(:,1),centroids(:,2),'yo')
 end
 linescanMatrix = NaN(sum(Dbw(:)),ceil(approxPixelWidthOfCellNuclei.*1.5)+1);% number of cell neigbor pairs x maximun length of line scan
