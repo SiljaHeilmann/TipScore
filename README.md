@@ -3,7 +3,7 @@
 
 - Download test data folders ``` raw_images_lsm_files ``` and ``` outlines_mat_files ``` from [Mendeley Data](https://data.mendeley.com/drafts/nr9cyyk265). (580MB) 
 
-- Make sure that current Matlab directory contains the folders ``` raw_images_lsm_files ``` and ``` outlines_mat_files ``` and all function .m files listed further below:
+- Make sure that current Matlab directory contains the folders ``` raw_images_tif_files ``` and ``` outlines_mat_files ``` and all function .m files listed further below:
 
 - Run ``` 'demoScript_OneImage_ManualInput.m' ``` to see an example of a script that analyses one image with manual input from the user during the run.
 
