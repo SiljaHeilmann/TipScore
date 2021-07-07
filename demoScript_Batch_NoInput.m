@@ -1,11 +1,11 @@
 close all
 
-path = pwd;%  pwd returns the path to the current folder.
-subfolderLSM = '/raw_images_lsm_files';
-subfolderMAT = '/outlines_mat_files';
+path = pwd;  % pwd returns the path to the current folder.
+subfolderTIF = 'raw_images_tif_files';
+subfolderMAT  = 'outlines_mat_files';
 
-list_lsm = dir([path filesep subfolderLSM filesep '*.lsm']);
-list_mat = dir([path filesep subfolderMAT filesep '*OL.mat']);
+list_tif = dir([path filesep subfolderTIF filesep '*.tif']);
+list_mat  = dir([path filesep subfolderMAT filesep '*OLnew.mat']);
 
 clear DS
 DS(1).ImageFileName = "";% initialize data structure for storing images, masks and extracted data of several images
@@ -18,45 +18,45 @@ approxPixelWidthOfTipStructure = 300;
 approxPixelWidthOfCellNuclei = 20;% resolution of all images is the same so we can use th esame length for all images in the folder
 manual_input_yes_no = 0;
  
-  answersMatrix = ... % matrix containing appropriate answers for the four promts given when the segmentDAPIimage() function is run with 'manual_input_yes_no=1'
-    [2 10 7 10
-     3 8  5 9
-     3 10 6 10
-     3 8  5 8 
-     3 10 7 10 
-     3 9  5 9
-     3 10 7 12
-     3 9  6 10];
+   answersMatrix = ... % matrix containing appropriate answers for the four promts given when the segmentDAPIimage() function is run with 'manual_input_yes_no=1'
+    [4 7 6 9
+     4 7 6 9
+     4 7 6 9
+     4 7 6 9
+     4 7 6 9
+     4 7 6 9
+     4 7 6 9];
  
-for ff = 1:length(list_lsm)
+ 
+for ff = 1:length(list_tif)
     
-    lsm_image_string   = [path filesep subfolderLSM filesep list_lsm(ff).name];
-    mat_OutLine_string = [path filesep subfolderMAT filesep list_mat(ff).name];
+    tif_image_string   = [path filesep subfolderTIF filesep list_tif(ff).name];
+    mat_outLine_string  = [path filesep subfolderMAT  filesep list_mat(ff).name];
     
-    load(mat_OutLine_string);% load hand drawn epithelial outline saved in .mat file
+    load(mat_outLine_string);% load hand drawn epithelial outline saved in .mat file
     
-    t = Tiff(lsm_image_string); % create tiff object
-    I = read(t); % read in image file (Tiff() reader works on .lsm zeiss files)
-    close(t);% close tiff object
+    OL = OLnew;% OL is called OLnew in .mat file
+    clear OLnew
+
+    C1 = double(imread(tif_image_string,1));% make double
+    C2 = double(imread(tif_image_string,2));
+    C3 = double(imread(tif_image_string,3));
+    C4 = double(imread(tif_image_string,4));
     
-    C1 = double(I(:,:,1));% make double
-    C2 = double(I(:,:,2));
-    C3 = double(I(:,:,3));
-    C4 = double(I(:,:,4));
-    
-    % Make normalized images for viewing  (normalize with respect to max
-    % value)
-    C1norm = C1./max(C1(:));
-    C2norm = C2./max(C2(:));
-    C3norm = C3./max(C3(:));
-    C4norm = C4./max(C4(:));
-    
+    % Make normalized images for viewing  (normalize with respect to 99
+    % percentile value)
+    C1norm = C1./prctile(C1(:),99.0);
+    C2norm = C2./prctile(C2(:),99.0);
+    C3norm = C3./prctile(C3(:),99.0);
+    C4norm = C4./prctile(C4(:),99.0);
+
     % make normalized rgb color image for quick viewing
-    COL = uint8(zeros(size(I,1),size(I,2),3));
-    COL(:,:,1) = uint8(C3norm.*255) + uint8(C1norm.*255).*5;% red Sox9 (C3)      , white CPA (C1)
-    COL(:,:,2) = uint8(C2norm.*255) + uint8(C1norm.*255).*5;% green p120ctn (C2) , white CPA (C1)
-    COL(:,:,3) = uint8(C4norm.*255) + uint8(C1norm.*255).*5;% blue DAPI (C4)     , white CPA (C1)
-    
+    COL = uint8(zeros(size(C1,1),size(C1,2),3));
+
+    COL(:,:,1) = uint8(C3norm.*255) + uint8(C1norm.*255);% red Sox9 (C3)      , white CPA (C1)
+    COL(:,:,2) = uint8(C2norm.*255) + uint8(C1norm.*255);% green p120ctn (C2) , white CPA (C1)
+    COL(:,:,3) = uint8(C4norm.*255) + uint8(C1norm.*255);% blue DAPI (C4)     , white CPA (C1)
+
     OL = imfill(OL,'holes');
     
     % make three layer segmentation edge image for inclusion in color image (COL_show)
@@ -66,7 +66,7 @@ for ff = 1:length(list_lsm)
     COL_show = COL;
     COL_show(imdilate(OL3edge,strel('disk',3))==1)=2^8-1;
     
-    imageName = list_lsm(ff).name;
+    imageName = list_tif(ff).name;
     imageFolderForOutput = [imageName(1:end-4) '_Image#' num2str(ff) ];
     
     % make new folder for output
@@ -82,7 +82,7 @@ for ff = 1:length(list_lsm)
     save([imageFolderForOutput filesep 'C4.mat'],'C4')
     save([imageFolderForOutput filesep 'COL_show.mat'],'COL_show')
     
-    disp(['Now processing image number ' num2str(ff) ' out of ' num2str(length(list_lsm))])
+    disp(['Now processing image number ' num2str(ff) ' out of ' num2str(length(list_tif))])
 
 % ------------------------------------------------------------------------    
 % Tip score calculation from outline OL    
@@ -100,7 +100,7 @@ for ff = 1:length(list_lsm)
     
     ROI = OL; % mask of eg. epithelial outline. If you want to segment nuclei everywhere then input ROI = image with all zeros.
     
-    answers = answersMatrix(ff,:);% use unique answer per image
+    answers = answersMatrix(ff,:);% can be used to give unique answer per image
     
     % ##################################################################
     NUCLEI_BW = segmentDAPIimage(IM,ROI,approxPixelWidthOfCellNuclei,manual_input_yes_no,answers);
@@ -112,7 +112,7 @@ for ff = 1:length(list_lsm)
 % Store everything in data structure DS
         
     DS(ff).OrgPath       = string(path);
-    DS(ff).OrgSubfolder  = string(subfolderLSM);
+    DS(ff).OrgSubfolder  = string(subfolderTIF);
     DS(ff).ImageFileName = string(imageName);
     DS(ff).FolderName    = string(imageFolderForOutput);
     DS(ff).COL_show      = COL_show;
@@ -129,7 +129,6 @@ end
 save([pwd filesep 'DS.mat'],'DS','-v7.3')% save data structure in current dir
 
 %load([pwd filesep 'DS.mat'])
-
 
 % ------------------------------------------------------------------------    
 % Plot/show tip score images for each image in the test set in one figure
@@ -253,10 +252,11 @@ end
 factor = 3;
 AllCellPairs.tipScoreGroup =  round(AllCellPairs.tipScore./factor,1)*factor;
 AllCells.tipScoreGroup     =  round(AllCells.tipScore    ./factor,1)*factor;
+
 tipscoregroups = unique(AllCellPairs.tipScoreGroup);
 tipscoregroups = tipscoregroups(isfinite(tipscoregroups));
 
-index1 = 6;
+index1 = 5; 
 tipscoregroups(index1)
 AllCellPairs.tipScoreGroup(AllCellPairs.tipScoreGroup<tipscoregroups(index1)) = tipscoregroups(index1);% -1.5;
 AllCells.tipScoreGroup(AllCells.tipScoreGroup<tipscoregroups(index1)) = tipscoregroups(index1);
@@ -274,58 +274,62 @@ save([pwd filesep 'AllCellPairs.mat'],'AllCellPairs')
 
 
 % ------------------------------------------------------------------------    
+%load([pwd filesep 'AllCells.mat'])
+%load([pwd filesep 'AllCellPairs.mat'])
+%load([pwd filesep 'DS.mat'])
+
+% ------------------------------------------------------------------------    
 % Plot Sox9 intensity as a function of (coarse grained) tip score. And compare groups with Kruskal Wallis
 
-figure
-for ff=1:length(DS)
-    ff
-    subplot(2,4,ff)
-    includeff = AllCells.ff==ff;
-    boxplot(AllCells.Sox9intensityNorm(includeff),AllCells.tipScoreGroup(includeff),'Notch','on','jitter',.1,'symbol','.'); hold on
-    axis([0 6 0 max(AllCells.Sox9intensityNorm)])
- %   xlabel('Tip score');  set(gca,'xticklabel',{'TS below -0.6','TS between -0.6 and -0.2','TS between -0.2 and 0.2','TS above 0.2' })
-    title(['Image #' num2str(ff)])
-end
+% figure
+% for ff=1:length(DS)
+%     ff
+%     subplot(2,4,ff)
+%     includeff = AllCells.ff==ff;
+%     boxplot(AllCells.Sox9intensityNorm(includeff),AllCells.tipScoreGroup(includeff),'Notch','on','jitter',.1,'symbol','.'); hold on
+%     axis([0 7 0 max(AllCells.Sox9intensityNorm)])
+% %    xlabel('Tip score');  set(gca,'xticklabel',{'-0.9: (TS below -0.75)','-0.6: (TS between -0.75 and -0.45)','-0.3: (TS between -0.45) and -0.15','0: (TS between -0.15 and 0.15)','0.3: (TS between 0.15 and 0.45)','0.6: (TS above 0.45)' })
+%     title(['Image #' num2str(ff)])
+% end
 
 figure
 boxplot(AllCells.Sox9intensityNorm,AllCells.tipScoreGroup,'Notch','on','jitter',.1,'symbol','.'); hold on
-xlabel('Tip score'); set(gca,'xticklabel',{'TS below -0.6','TS between -0.6 and -0.2','TS between -0.2 and 0.2','TS above 0.2' })
+xlabel('Tip score','Fontsize',15);   set(gca,'xticklabel',{'-0.9: (TS below -0.75)','-0.6: (TS between -0.75 and -0.45)','-0.3: (TS between -0.45) and -0.15','0: (TS between -0.15 and 0.15)','0.3: (TS between 0.15 and 0.45)','0.6: (TS above 0.45)' })
 
-ylabel('Normalized  Sox9 intensity per cell')
+
+set(findobj(gca,'type','line'),'linew',2)
+
+ylabel('Normalized  Sox9 intensity per cell','Fontsize',15)
 
 [pSox9,tblSox9,statsSox9] = kruskalwallis(AllCells.Sox9intensityNorm,AllCells.tipScoreGroup);
-[cSox9,mSox9,hSox9,gnamesSox9] = multcompare(statsSox9);
+[cSox9,mSox9,hSox9,gnamesSox9] = multcompare(statsSox9,'Alpha',0.05);
+
 
 % ------------------------------------------------------------------------    
 % Plot p120ctn intensity as a function of (coarse grained) tip score. And compare groups with Kruskal Wallis
 
-figure
-for ff=1:length(DS)
-    ff
-    subplot(2,4,ff)
-    includeff = AllCellPairs.ff==ff;
-    boxplot(AllCellPairs.p120ctnMaxIntNorm(includeff),AllCellPairs.tipScoreGroup(includeff),'Notch','on','jitter',.1,'symbol','.'); hold on
-    axis([0 6 0 max(AllCellPairs.p120ctnMaxIntNorm)])
-%    xlabel('Tip score');  set(gca,'xticklabel',{'TS below -0.6','TS between -0.6 and -0.2','TS between -0.2 and 0.2','TS above 0.2' })
-    title(['Image #' num2str(ff)])
-end
-
+% figure
+% for ff=1:length(DS)
+%     ff
+%     subplot(2,4,ff)
+%     includeff = AllCellPairs.ff==ff;
+%     boxplot(AllCellPairs.p120ctnMaxIntNorm(includeff),AllCellPairs.tipScoreGroup(includeff),'Notch','on','jitter',.1,'symbol','.'); hold on
+%     axis([0 7 0 max(AllCellPairs.p120ctnMaxIntNorm)])
+%     xlabel('Tip score');  % set(gca,'xticklabel',{'-0.9: (TS below -0.75)','-0.6: (TS between -0.75 and -0.45)','-0.3: (TS between -0.45) and -0.15','0: (TS between -0.15 and 0.15)','0.3: (TS between 0.15 and 0.45)','0.6: (TS above 0.45)' })
+%     title(['Image #' num2str(ff)])
+% end
 
 figure
 boxplot(AllCellPairs.p120ctnMaxIntNorm,AllCellPairs.tipScoreGroup,'Notch','on','jitter',.1,'symbol','.'); hold on
-xlabel('Tip score');  set(gca,'xticklabel',{'TS below -0.6','TS between -0.6 and -0.2','TS between -0.2 and 0.2','TS above 0.2' })
+xlabel('Tip score','Fontsize',15);  set(gca,'xticklabel',{'-0.9: (TS below -0.75)','-0.6: (TS between -0.75 and -0.45)','-0.3: (TS between -0.45) and -0.15','0: (TS between -0.15 and 0.15)','0.3: (TS between 0.15 and 0.45)','0.6: (TS above 0.45)' })
+set(findobj(gca,'type','line'),'linew',2)
 
-ylabel('Normalized max p120ctn int. per cell-pair linescan')
+
+ylabel('Normalized max p120ctn int. per cell-pair linescan','Fontsize',15)
 
 [pp120,tblp120,statsp120] = kruskalwallis(AllCellPairs.p120ctnMaxIntNorm,AllCellPairs.tipScoreGroup);
-[cp120,mp120,hp120,gnamesp120] = multcompare(statsp120);
+[cp120,mp120,hp120,gnamesp120] = multcompare(statsp120,'Alpha',0.05)
 
-
-X=unique(AllCellPairs.tipScoreGroup);
-X=X(isfinite(X))
-
-%
-[h,p]=adtest(AllCellPairs.p120ctnMaxIntNorm(AllCellPairs.tipScoreGroup==0))
 
 
 
