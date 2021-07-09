@@ -8,7 +8,7 @@ subfolderMAT  = 'outlines_mat_files';
 list_tif = dir([path filesep subfolderTIF filesep '*.tif']);
 list_mat  = dir([path filesep subfolderMAT filesep '*OLnew.mat']);
 
-ff = 6;%% Run with manual input for just one image file in folder (raw_images_lsm_files) with 7 test images
+ff = 6;%% Run with manual input for just one image file in folder (raw_images_tif_files) with 7 test images
 
 tif_image_string   = [path filesep subfolderTIF filesep list_tif(ff).name];
 mat_outLine_string  = [path filesep subfolderMAT  filesep list_mat(ff).name];
