@@ -1,5 +1,5 @@
 # TipScore
-**MATLAB** functions for image analysis of branched organ structures (such as the pancreas). See details: [STAR Protocols](https://docs.google.com/document/d/143IZt6-4IdLZK5zwaFn9D988-nppJYnUX7sv5Kt3IIc/edit)
+**MATLAB** functions for image analysis of branched organ structures (such as the pancreas). See details: [STAR Protocols](https://www.cell.com/star-protocols/home)
 
 - Download test data folders ``` raw_images_tif_files ``` and ``` outlines_mat_files ``` from [Mendeley Data](https://data.mendeley.com/drafts/nr9cyyk265). (574MB) 
 
