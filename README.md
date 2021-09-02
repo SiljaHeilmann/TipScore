@@ -25,4 +25,4 @@ returnTableWithCellPairInt.m
 <img width="450" alt="Screen Shot 2021-07-07 at 13 04 12" src="https://user-images.githubusercontent.com/11952601/124749116-1f302e00-df24-11eb-9c5c-f15845e7acd8.png">
 
 
-**S. Heilmann, H. Semb, P. Nyeng.** *Quantifying spatial position in a branched structure in immunostained mouse tissue sections*. STAR Protocols, Volume X, Issue X, 2021.
+**S. Heilmann, H. Semb, P. Nyeng.** *Quantifying spatial position in a branched structure in immunostained mouse tissue sections*. STAR Protocols, 2021.
